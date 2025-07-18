@@ -9,15 +9,18 @@ const Alert = require('./models/Alert')
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require ('./routes/userRoutes')
 const alertRoutes = require('./routes/alertRoutes')
+const { startAlertMonitor } = require('./services/alertMonitor');
 
 const app = express();
 const PORT = process.env.PORT || 3000; 
 
 connectDB();
 
+//middlewares
 app.use(cors()); 
 app.use(express.json()); 
 
+//rotas api
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes );
 app.use('/api/alerts', alertRoutes)
@@ -31,4 +34,5 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 Backend rodando na porta ${PORT}`);
     console.log(`Acesse: http://localhost:${PORT}`);
+    startAlertMonitor();
 });
