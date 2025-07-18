@@ -1,28 +1,83 @@
-// frontend/src/App.jsx
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+// frontend/src/App.jsx (apenas a função Dashboard)
+import React, { useState, useEffect } from 'react'; // Importar useState e useEffect
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Register from './pages/Auth/Register';
 import Login from './pages/Auth/login';
-import './App.css'; 
 
+//Dashboard
 function Dashboard() {
-  // Exemplo de como pegar o token e usuário do localStorage
-  const token = localStorage.getItem('token');
-  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+  const [user, setUser] = useState(null); 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate(); 
 
-  if (!token || !user) {
-    return <Navigate to="/login" replace />; 
-  }
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login'); 
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/users/profile', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          //se o token for invalido/expirado, o back retorna 401
+          if (response.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            navigate('/login');
+          }
+          throw new Error(data.message || 'Erro ao carregar perfil.');
+        }
+
+        setUser(data.user);
+      } catch (err) {
+        console.error('Erro ao buscar perfil:', err);
+        setError(err.message || 'Falha ao carregar os dados do usuário.');
+        localStorage.removeItem('token'); //"limpa" o toke em caso de erro grave
+        localStorage.removeItem('user');
+        navigate('/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login'; 
+    navigate('/login'); //redireciona para o login
   };
+
+  if (loading) {
+    return <div style={{ padding: '20px', textAlign: 'center' }}>Carregando dashboard...</div>;
+  }
+
+  if (error) {
+    return <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>Erro: {error}</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;//fallback
+  }
 
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
       <h1>Bem-vindo ao Dashboard, {user.name}!</h1>
+      <p>Email: {user.email}</p>
+      {user.whatsappNumber && <p>WhatsApp: {user.whatsappNumber}</p>}
       <p>Você está logado. Aqui virá o painel de investimentos.</p>
       <button onClick={handleLogout} style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
         Sair
@@ -30,6 +85,7 @@ function Dashboard() {
     </div>
   );
 }
+
 
 function App() {
   return (
@@ -45,4 +101,4 @@ function App() {
   );
 }
 
-export default App;
+export default App

@@ -7,6 +7,7 @@ const { connectDB } = require('./config/database');
 
 const User = require('./models/User');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require ('./routes/userRoutes')
 const app = express();
 const PORT = process.env.PORT || 3000; 
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(express.json()); 
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes )
 
 // teste
 app.get('/', (req, res) => {
