@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 
 const express = require('express');
@@ -9,6 +8,7 @@ const Alert = require('./models/Alert')
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require ('./routes/userRoutes')
 const alertRoutes = require('./routes/alertRoutes')
+const marketRoutes = require('./routes/marketRoutes')
 const { startAlertMonitor } = require('./services/alertMonitor');
 
 const app = express();
@@ -23,7 +23,8 @@ app.use(express.json());
 //rotas api
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes );
-app.use('/api/alerts', alertRoutes)
+app.use('/api/alerts', alertRoutes);
+app.use('/api/market', marketRoutes)
 
 // teste
 app.get('/', (req, res) => {
