@@ -67,7 +67,7 @@ function AuthForm({ type, onSubmit }) {
         </div>
         {type === 'register' && (
           <div className="form-group">
-            <label htmlFor="whatsappNumber">WhatsApp (opcional):</label>
+            <label htmlFor="whatsappNumber">Número:</label>
             <input
               type="text"
               id="whatsappNumber"
