@@ -6,10 +6,13 @@ import Register from './pages/Auth/Register';
 import Login from './pages/Auth/login';
 
 
-import Dashboard from './pages/Dashboard/Dashboard'; // Importa o Dashboard do novo local
+import Dashboard from './pages/Dashboard/Dashboard'; 
 
 
 import AlertManager from './pages/Alerts/AlertManager';
+
+
+import ProfileEdit from './pages/Profile/ProfileEdit';
 
 import './App.css';
 
@@ -28,6 +31,8 @@ function App() {
 
         {/* Rota para o Gerenciador de Alertas (protegida pela logica interna do AlertManager.jsx) */}
         <Route path="/alerts" element={<AlertManager />} />
+
+         <Route path="/profile" element={<ProfileEdit />} /> 
 
         {/* Rota padrão que redireciona para o login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
