@@ -1,68 +1,124 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* frontend/src/index.css */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* --- CSS Reset --- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
+/* --- Variáveis CSS para Tema Escuro (Inspirado na Binance) --- */
+:root {
+    /* Cores primárias */
+    --background-dark: #1e2026; /* Fundo principal */
+    --background-light: #282b33; /* Fundo de componentes/cards */
+    --text-light: #e0e0e0;      /* Texto padrão claro */
+    --text-muted: #a0a0a0;      /* Texto secundário/subtle */
+    --primary-brand: #fcd535;   /* Amarelo/Dourado da Binance */
+    --primary-hover: #f0b90b;   /* Amarelo mais escuro para hover */
+    --secondary-blue: #007bff; /* Azul para botões/links (pode ser ajustado para Binance azul) */
+    --secondary-blue-hover: #0056b3;
+
+    /* Cores de status */
+    --success-green: #00b894; /* Verde para positivo */
+    --danger-red: #e15f41;    /* Vermelho para negativo/erro */
+    --warning-yellow: #ffc107; /* Amarelo para aviso */
+    --info-blue: #17a2b8;     /* Azul para informação */
+
+    /* Cores de bordas e divisores */
+    --border-color: #3a3f45;
+    --shadow-dark: rgba(0, 0, 0, 0.5);
+    --shadow-light: rgba(0, 0, 0, 0.2);
+
+    /* Tipografia */
+    font-family: 'Open Sans', sans-serif; /* Fonte que se parece com a da Binance */
+    line-height: 1.6;
+    font-weight: 400;
+
+    /* Cor de esquema para navegador */
+    color-scheme: dark; /* Prioriza o tema escuro no sistema */
+    color: var(--text-light);
+    background-color: var(--background-dark);
+
+    /* Otimizações de fonte */
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Estilos Base para o Body --- */
+body {
+    margin: 0;
+    padding: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: var(--background-dark); /* Garante o fundo escuro */
+    color: var(--text-light); /* Garante a cor do texto padrão */
+}
+
+/* --- Estilos Base para Títulos --- */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-light);
+    line-height: 1.2;
+    margin-bottom: 0.5em; /* Espaçamento padrão para títulos */
+}
+
+/* Ajustes para o h1, se necessário, mas as variáveis já padronizam */
+h1 {
+    font-size: 2.8em; /* Ajuste para ter um tamanho mais controlado */
+}
+
+/* --- Estilos Base para Links --- */
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+    font-weight: 500;
+    color: var(--primary-brand); /* Cor primária de destaque */
+    text-decoration: none;
+    transition: color 0.3s ease;
 }
 a:hover {
-  color: #535bf2;
+    color: var(--primary-hover); /* Cor de hover */
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
+/* --- Estilos Base para Botões --- */
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+    border-radius: 5px; /* Ajuste para bordas levemente mais arredondadas */
+    border: 1px solid transparent;
+    padding: 0.7em 1.5em; /* Padding ajustado */
+    font-size: 1em;
+    font-weight: 600; /* Levemente mais negrito */
+    font-family: inherit;
+    background-color: var(--secondary-blue); /* Cor de botão padrão */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 button:hover {
-  border-color: #646cff;
+    background-color: var(--secondary-blue-hover);
+    border-color: var(--secondary-blue-hover);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+    outline: 4px auto var(--primary-brand); /* Foco com a cor de destaque */
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* --- Estilos para Mensagens de Sucesso/Erro (globais) --- */
+.success-message {
+    color: var(--success-green);
+    background-color: rgba(0, 184, 148, 0.1); /* Um fundo levemente verde */
+    border: 1px solid var(--success-green);
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.error-message {
+    color: var(--danger-red);
+    background-color: rgba(225, 95, 65, 0.1); /* Um fundo levemente vermelho */
+    border: 1px solid var(--danger-red);
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
 }

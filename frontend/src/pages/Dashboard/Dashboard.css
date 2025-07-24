@@ -1,0 +1,297 @@
+.dashboard-container {
+    padding: 2rem;
+    max-width: 80rem; 
+    margin: 2rem auto;
+    background-color: var(--background-light); 
+    border-radius: 0.625rem;
+    box-shadow: 0 0.25rem 0.75rem var(--shadow-dark);
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+    min-height: calc(100vh - var(--navbar-height, 60px) - 4rem);
+}
+
+.dashboard-container h1 {
+    text-align: center;
+    color: var(--primary-brand);
+    margin-bottom: 1rem;
+    font-size: 2.5em;
+    font-weight: 700;
+}
+
+.dashboard-subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    font-size: 1.1rem;
+}
+
+.dashboard-section {
+    background-color: var(--background-dark); 
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.dashboard-section h2 {
+    color: var(--text-light);
+    font-size: 1.5em;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+/* Saldo da Carteira */
+.portfolio-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.portfolio-value, .portfolio-change {
+    margin-bottom: 0.75rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.value-display {
+    font-size: 2.2em; 
+    font-weight: 700;
+    color: var(--primary-brand); 
+}
+
+.change-display {
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.positive-change {
+    color: var(--success-green);
+}
+
+.negative-change {
+    color: var(--danger-red);
+}
+
+/* Alertas Ativos / Preços de Ativos Monitorados */
+.no-assets-message, .no-activity-message {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 1rem;
+    border: 1px dashed var(--border-color);
+    border-radius: 0.375rem;
+}
+
+.alerts-list, .prices-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.alert-item, .price-item {
+    background-color: var(--background-dark-alt); 
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.375rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    flex-wrap: wrap; 
+    gap: 0.5rem; 
+}
+
+.current-price-display {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    margin-left: 0.5rem;
+}
+
+
+/* Quick Actions */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.action-button {
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    text-decoration: none; 
+    text-align: center;
+    cursor: pointer;
+    border: none; 
+    color: var(--background-dark); 
+}
+
+.buy-button {
+    background-color: var(--primary-brand);
+    color: var(--background-dark);
+}
+.buy-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.sell-button {
+    background-color: var(--danger-red);
+    color: white;
+}
+.sell-button:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+.deposit-button, .withdraw-button {
+    background-color: var(--secondary-blue);
+    color: white;
+}
+.deposit-button:hover, .withdraw-button:hover {
+    background-color: var(--secondary-blue-hover);
+    transform: translateY(-2px);
+}
+
+/* Loading state */
+.dashboard-container.loading {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--primary-brand);
+    margin-top: 3rem;
+    background-color: var(--background-dark); 
+    border: none;
+    box-shadow: none;
+}
+
+/* Error message styling */
+.error-message {
+    color: var(--danger-red);
+    background-color: rgba(225, 95, 65, 0.1);
+    border: 1px solid var(--danger-red);
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1.5rem;
+        margin: 1.5rem auto;
+    }
+
+    .dashboard-container h1 {
+        font-size: 2.2em;
+    }
+
+    .dashboard-section {
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .dashboard-section h2 {
+        font-size: 1.3em;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .portfolio-value, .portfolio-change {
+        font-size: 1.1rem;
+    }
+
+    .value-display {
+        font-size: 1.8em;
+    }
+
+    .change-display {
+        font-size: 1.2em;
+    }
+
+    .actions-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .action-button {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .alert-item, .price-item {
+        flex-direction: column; 
+        align-items: flex-start;
+        padding: 0.7rem;
+        font-size: 0.9rem;
+    }
+    .current-price-display {
+        margin-left: 0; 
+        margin-top: 0.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+
+    .dashboard-container h1 {
+        font-size: 2em;
+        margin-bottom: 0.75rem;
+    }
+
+    .dashboard-subtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .dashboard-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-section h2 {
+        font-size: 1.2em;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .portfolio-value, .portfolio-change {
+        flex-direction: column;
+        align-items: center;
+        font-size: 1rem;
+        gap: 0.25rem;
+    }
+
+    .value-display {
+        font-size: 1.6em;
+    }
+
+    .change-display {
+        font-size: 1.1em;
+    }
+
+    .actions-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    .action-button {
+        padding: 0.7rem;
+        font-size: 0.9rem;
+    }
+
+    .alert-item, .price-item {
+        font-size: 0.85rem;
+        padding: 0.6rem;
+    }
+}
