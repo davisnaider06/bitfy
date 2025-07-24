@@ -1,44 +1,68 @@
-import React from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Para redirecionar e linkar
-import AuthForm from '../../components/AuthForm/AuthForm';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import AuthForm from "../../components/AuthForm/AuthForm"; 
 
 function Register() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = async (formData) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    setError("");
+
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3001/api/auth/register", { 
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ username, email, password, whatsappNumber }), 
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        
-        throw new Error(data.message || 'Erro ao registrar usuário.');
+      if (response.ok) {
+        setMessage("Registro bem-sucedido!");
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setWhatsappNumber(""); // Limpa o campo de WhatsApp após o registro
+        // navigate('/dashboard');
+      } else {
+        throw new Error(data.message || "Erro no registro.");
       }
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user)); // Salva dados do usuário
-      console.log('Registro bem-sucedido:', data);
-      navigate('/dashboard');
-
-    } catch (error) {
-      console.error('Erro no handleRegister:', error);
-      throw error;
+    } catch (err) {
+      console.error("Erro no registro:", err);
+      setError(err.message || "Falha ao registrar.");
     }
   };
 
   return (
-    <div className="register-page">
-      <AuthForm type="register" onSubmit={handleRegister} />
-      <div className="auth-links">
+    <AuthForm
+      title="Criar Conta"
+      onSubmit={handleSubmit}
+      username={username}
+      setUsername={setUsername}
+      email={email}
+      setEmail={setEmail}
+      password={password}
+      setPassword={setPassword}
+      whatsappNumber={whatsappNumber} // Passa o estado do WhatsApp para o AuthForm
+      setWhatsappNumber={setWhatsappNumber} // Passa o setter do WhatsApp para o AuthForm
+      message={message}
+      error={error}
+      isRegister={true} 
+    >
+      <p>
         Já tem uma conta? <Link to="/login">Faça Login</Link>
-      </div>
-    </div>
+      </p>
+    </AuthForm>
   );
 }
 
