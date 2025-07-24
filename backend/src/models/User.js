@@ -34,31 +34,33 @@ const User = sequelize.define('User', {
   },
   whatsappNumber: { 
     type: DataTypes.STRING,
-    allowNull: true, 
+    allowNull: false, 
     unique: true, 
   },
-  
-}, {
-  tableName: 'users', 
-  timestamps: true, 
-  hooks: {
+
+ resetPasswordToken: {
+        type: DataTypes.STRING,
+        allowNull: true, //preenchido quando um token for gerado
+    },
+    resetPasswordExpires: {
+        type: DataTypes.DATE,
+        allowNull: true, 
+    }
     
-    beforeCreate: async (user) => {
-      if (user.password) {
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);
-      }
-    },
-    beforeUpdate: async (user) => {
-      if (user.changed('password')) { 
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);
-      }
-    },
-  },
+}, {
+    timestamps: true, //createdAt updatedAt
+    tableName: 'users', 
 });
 
 
+User.beforeCreate(async (user) => {
+    if (user.password) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+    }
+});
+
+//comparar senhas
 User.prototype.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };

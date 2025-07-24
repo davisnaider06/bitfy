@@ -26,7 +26,7 @@ async function connectDB() {
     await sequelize.authenticate();
     console.log('✅ Conexão com o banco de dados estabelecida com sucesso!');
     
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log('✅ Modelos do banco de dados sincronizados!');
   } catch (error) {
     console.error('❌ Erro ao conectar ou sincronizar o banco de dados:', error);

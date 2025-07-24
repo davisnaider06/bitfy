@@ -1,41 +1,43 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-
+//Importações dos componentes de Autenticação
 import Register from './pages/Auth/Register';
-import Login from './pages/Auth/login';
+import Login from './pages/Auth/login'; 
+import ForgotPassword from './pages/Auth/forgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 
+import PrivateRoute from './components/PrivateRoute';
 
-import Dashboard from './pages/Dashboard/Dashboard'; 
-
-
+// Importações dos componentes de Funcionalidade
+import Dashboard from './pages/Dashboard/Dashboard';
 import AlertManager from './pages/Alerts/AlertManager';
+import ProfileEdit from './pages/Profile/ProfileEdit'; // Importado
 
-
-import ProfileEdit from './pages/Profile/ProfileEdit';
-
-import './App.css';
+import './App.css'; 
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Rota pro registro */}
-        <Route path="/register" element={<Register />} />
-
-        {/* Rota pro login */}
+        
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        {/* Rota pro Dashboard (protegida via pela logica interna do Dashboard.jsx) */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/alerts" element={<AlertManager />} />
+          <Route path="/profile" element={<ProfileEdit />} />
+          
+        </Route>
 
-        {/* Rota para o Gerenciador de Alertas (protegida pela logica interna do AlertManager.jsx) */}
-        <Route path="/alerts" element={<AlertManager />} />
-
-         <Route path="/profile" element={<ProfileEdit />} /> 
-
-        {/* Rota padrão que redireciona para o login */}
+      
         <Route path="/" element={<Navigate to="/login" replace />} />
+
+        
       </Routes>
     </Router>
   );
