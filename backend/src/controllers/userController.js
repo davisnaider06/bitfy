@@ -1,6 +1,26 @@
 const User = require('../models/User');
 const Alert = require('../models/Alert'); 
 
+
+// Obter perfil do usuário autenticado
+const getUserProfile = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id, {
+            attributes: { exclude: ['password'] }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('Erro ao obter perfil do usuário:', error);
+        res.status(500).json({ message: 'Erro no servidor ao obter perfil.' });
+    }
+};
+
+
 // Obter todos os usuários
 const getAllUsers = async (req, res) => {
     try {
@@ -102,5 +122,6 @@ module.exports = {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUserProfile
 };
