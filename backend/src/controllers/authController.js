@@ -1,5 +1,6 @@
 
 const User = require('../models/User');
+const { ensureUserWallet } = require('./transactionController');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto'); // modulo node.js para gerar tokens seguros
@@ -13,54 +14,51 @@ const generateToken = (id) => {
 
 //[POST]/api/auth/register
 const registerUser = async (req, res) => {
-    const { username, email, password, whatsappNumber } = req.body;
+    const { name, email, password, whatsappNumber } = req.body;
 
-    if (
-        !username || username.trim() === '' ||
-        !email || email.trim() === '' ||
-        !password || password.trim() === '' ||
-        !whatsappNumber || whatsappNumber.trim() === ''
-    ) {
+
+    if (!name || !email || !password || !whatsappNumber) {
         return res.status(400).json({ message: 'Por favor, preencha todos os campos obrigatórios.' });
     }
 
     try {
-        //Verifica se ja tem o email no banco
-        let user = await User.findOne({ where: { email } });
-        if (user) {
-            return res.status(400).json({ message: 'Usuário com este email já existe.' });
+        const userExists = await User.findOne({ where: { email } }); 
+        if (userExists) {
+            return res.status(400).json({ message: 'Email já cadastrado.' });
         }
 
+        const nameExists = await User.findOne({ where: { name } }); 
+        if (nameExists) {
+            return res.status(400).json({ message: 'Nome de usuário já cadastrado.' });
+        }
 
-        //Criar o novo usuário no banco de dados
-        user = await User.create({
-             name: username,
-             username: username,
-             email,
-             password,
-             whatsappNumber,
+        const user = await User.create({
+            name,
+            email,
+            password, 
+            whatsappNumber
         });
 
-        //Gerar o token JWT para o novo usuário
-        const token = generateToken(user.id);
+       
+        await ensureUserWallet(user.id, null); 
 
         res.status(201).json({
-            message: 'Usuário registrado com sucesso!',
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                whatsappNumber: user.whatsappNumber,
-            },
-            token,
+          id: user.id, 
+          name: user.name,
+          email: user.email,
+          whatsappNumber: user.whatsappNumber,
+          token: generateToken(user.id), 
+          message: 'Registro bem-sucedido! Bem-vindo.',
+          redirect: '/dashboard'
         });
 
     } catch (error) {
-        console.error('Erro ao registrar usuário:', error);
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            return res.status(400).json({ message: 'Já existe um usuário com este email ou número de WhatsApp.' });
+        console.error('Erro no registro de usuário (Sequelize):', error);
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            const messages = error.errors.map(err => err.message);
+            return res.status(400).json({ message: messages.join(', ') });
         }
-        res.status(500).json({ message: 'Erro interno do servidor ao registrar usuário.' });
+        res.status(500).json({ message: 'Erro no servidor durante o registro.', error: error.message });
     }
 };
 

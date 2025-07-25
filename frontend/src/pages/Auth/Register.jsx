@@ -33,7 +33,7 @@ function Register() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, email, password, whatsappNumber }),
+                body: JSON.stringify({ name: username, email, password, whatsappNumber }),
             });
 
             const data = await response.json();

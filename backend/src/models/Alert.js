@@ -56,7 +56,7 @@ const Alert = sequelize.define('Alert', {
 
 
 // Define a associação entre User e Alert
-User.hasMany(Alert, { foreignKey: 'userId', onDelete: 'CASCADE' });
-Alert.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Alert, { foreignKey: 'userId'});
+Alert.belongsTo(User, { foreignKey: 'userId', onDelet: 'CASCADE' });
 
 module.exports = Alert;
