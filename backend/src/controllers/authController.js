@@ -1,5 +1,6 @@
 
 const User = require('../models/User');
+const { ensureUserWallet } = require('./transactionController');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto'); // modulo node.js para gerar tokens seguros
@@ -13,53 +14,59 @@ const generateToken = (id) => {
 
 //[POST]/api/auth/register
 const registerUser = async (req, res) => {
-  const { name, email, password, whatsappNumber } = req.body;
-  
-  if (
-        !name || username.trim() === '' || 
-        !email || email.trim() === '' ||       
-        !password || password.trim() === '' || 
-        !whatsappNumber || whatsappNumber.trim() === ''
-    ) {
+    const { name, email, password, whatsappNumber } = req.body;
+
+
+    if (!name || !email || !password || !whatsappNumber) {
         return res.status(400).json({ message: 'Por favor, preencha todos os campos obrigatórios.' });
     }
 
-  try {
-    let user = await User.findOne({ where: { email } });
-    if (user) {
-      return res.status(400).json({ message: 'Usuário com este email já existe.' });
+    try {
+        const userExists = await User.findOne({ where: { email } }); 
+        if (userExists) {
+            return res.status(400).json({ message: 'Email já cadastrado.' });
+        }
+
+        const nameExists = await User.findOne({ where: { name } }); 
+        if (nameExists) {
+            return res.status(400).json({ message: 'Nome de usuário já cadastrado.' });
+        }
+
+        const user = await User.create({
+            name,
+            email,
+            password, 
+            whatsappNumber
+        });
+
+       
+        await ensureUserWallet(user.id, null); 
+
+        res.status(201).json({
+          id: user.id, 
+          name: user.name,
+          email: user.email,
+          whatsappNumber: user.whatsappNumber,
+          token: generateToken(user.id), 
+          message: 'Registro bem-sucedido! Bem-vindo.',
+          redirect: '/dashboard'
+        });
+
+    } catch (error) {
+        console.error('Erro no registro de usuário (Sequelize):', error);
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            const messages = error.errors.map(err => err.message);
+            return res.status(400).json({ message: messages.join(', ') });
+        }
+        res.status(500).json({ message: 'Erro no servidor durante o registro.', error: error.message });
     }
-
-
-    user = await User.create({
-      name,
-      email,
-      password, 
-      whatsappNumber,
-    });
-
-   
-    const token = generateToken(user.id);
-    res.status(201).json({
-      message: 'Usuário registrado com sucesso!',
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        whatsappNumber: user.whatsappNumber,
-      },
-      token,
-    });
-
-  } catch (error) {
-    console.error('Erro ao registrar usuário:', error);
-    res.status(500).json({ message: 'Erro no servidor ao registrar usuário.' });
-  }
 };
 
 //[POST]/api/auth/login
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
+console.log('Tentativa de login para:', { email, password });
 
   if (!email || !password) {
     return res.status(400).json({ message: 'Por favor, preencha email e senha.' });
@@ -68,12 +75,18 @@ const loginUser = async (req, res) => {
   try {
     
     const user = await User.findOne({ where: { email } });
+    console.log('Usuário encontrado:', user ? user.email : 'Nenhum usuário com este email.');
     if (!user) {
       return res.status(401).json({ message: 'Credenciais inválidas.' });
     }
 
     
     const isMatch = await user.comparePassword(password);
+    
+    console.log(`Senha fornecida: '${password}'`);
+        console.log(`Senha hash no DB: '${user.password}'`); // CUIDADO: Em produção, NUNCA logue senhas hash! Apenas para depuração.
+        console.log('Resultado da comparação de senha (isMatch):', isMatch);
+    
     if (!isMatch) {
       return res.status(401).json({ message: 'Credenciais inválidas.' });
     }
@@ -84,7 +97,7 @@ const loginUser = async (req, res) => {
       message: 'Login bem-sucedido!',
       user: {
         id: user.id,
-        name: user.name,
+        name: user.username,
         email: user.email,
         whatsappNumber: user.whatsappNumber,
       },

@@ -10,6 +10,8 @@ const userRoutes = require ('./routes/userRoutes')
 const alertRoutes = require('./routes/alertRoutes')
 const marketRoutes = require('./routes/marketRoutes')
 const { startAlertMonitor } = require('./services/alertMonitor');
+const cryptoRoutes = require('./routes/cryptoRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000; 
@@ -24,7 +26,9 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes );
 app.use('/api/alerts', alertRoutes);
-app.use('/api/market', marketRoutes)
+app.use('/api/market', marketRoutes);
+app.use('/api/crypto', cryptoRoutes);
+app.use('/api/transactions', transactionRoutes);
 
 // teste
 app.get('/', (req, res) => {

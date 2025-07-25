@@ -1,0 +1,186 @@
+.market-container {
+    padding: 2rem; 
+    max-width: 87.5rem; 
+    margin: 1.5rem auto;
+    background-color: var(--background-light); 
+    border-radius: 0.625rem;
+    box-shadow: 0 0.3rem 0.9rem var(--shadow-dark); 
+    font-family: var(--font-family-base); /* Usa a fonte definida globalmente */
+    color: var(--text-light); /* Cor do texto padrão (claro) */
+    border: 1px solid var(--border-color); /* Borda sutil */
+}
+
+/* Título principal da página */
+.market-container h1 {
+    text-align: center;
+    color: var(--primary-brand); /* Amarelo de destaque */
+    margin-bottom: 1rem; /* Margem em rem */
+    font-size: 2em; /* Tamanho da fonte relativo ao pai */
+    font-weight: 700;
+}
+
+/* Parágrafo de descrição/fonte de dados */
+.market-container p {
+    text-align: center;
+    color: var(--text-muted); /* Cor do texto secundário */
+    margin-bottom: 2rem; /* Margem em rem */
+    font-size: 0.95rem; /* Tamanho da fonte em rem */
+}
+
+/* Contêiner da tabela para controle de overflow */
+.crypto-table-container {
+    overflow-x: auto; /* Permite scroll horizontal em telas pequenas */
+    background-color: var(--background-dark); /* Fundo ligeiramente mais escuro para a tabela */
+    border-radius: 0.5rem; /* Bordas arredondadas em rem */
+    padding: 1rem; /* Padding em rem */
+    box-shadow: inset 0 0 0.625rem rgba(0, 0, 0, 0.2); /* Sombra interna para um efeito sutil */
+}
+
+/* Estilo da tabela */
+.crypto-table {
+    width: 100%; /* Ocupa toda a largura do contêiner */
+    border-collapse: collapse; /* Remove espaçamento entre bordas de células */
+    text-align: left; /* Alinhamento do texto */
+}
+
+/* Estilo para cabeçalhos e células da tabela */
+.crypto-table th, .crypto-table td {
+    padding: 1rem 1.25rem; /* Espaçamento interno em rem */
+    border-bottom: 1px solid var(--border-color); /* Linha de separação */
+    color: var(--text-light); /* Cor do texto */
+    white-space: nowrap; /* Evita quebra de linha por padrão */
+}
+
+/* Estilo específico para cabeçalhos da tabela */
+.crypto-table th {
+    background-color: #2d3038; /* Fundo do cabeçalho, um pouco mais escuro */
+    color: var(--text-muted); /* Cor do texto do cabeçalho */
+    font-weight: 600; /* Negrito médio */
+    text-transform: uppercase; /* Texto em maiúsculas */
+    font-size: 0.85rem; /* Tamanho de fonte menor em rem */
+    white-space: nowrap; /* Evita quebra de linha nos cabeçalhos */
+}
+
+/* Efeito de hover nas linhas da tabela */
+.crypto-table tbody tr:hover {
+    background-color: var(--border-color); /* Cor de fundo no hover */
+}
+
+/* Estilo para a célula que contém o nome e o ícone da criptomoeda */
+.crypto-name-cell {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+/* Estilo para o ícone da criptomoeda */
+.crypto-icon {
+    width: 1.75rem; 
+    height: 1.75rem; 
+    margin-right: 0.75rem; 
+    border-radius: 50%;
+}
+
+/* Estilo para o símbolo da criptomoeda (ex: BTC, ETH) */
+.crypto-symbol {
+    color: var(--text-muted);
+    margin-left: 0.5rem;
+    font-size: 0.8rem; 
+}
+
+/* Cores para a variação percentual (24h) */
+.positive-change {
+    color: var(--success-green);
+    font-weight: bold;
+}
+
+.negative-change {
+    color: var(--danger-red);
+    font-weight: bold;
+}
+
+/* Estilo para mensagens de erro (usando as variáveis globais) */
+.error-message {
+    color: var(--danger-red);
+    background-color: rgba(225, 95, 65, 0.1);
+    border: 1px solid var(--danger-red);
+    text-align: center;
+    font-weight: bold;
+    margin-top: 1.5rem; 
+    font-size: 1.1rem; 
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+/* Estilo para a mensagem de carregamento */
+.market-container.loading {
+    text-align: center;
+    font-size: 1.2rem; 
+    color: var(--primary-brand);
+    margin-top: 3rem; 
+}
+
+
+/* Responsividade para a Tabela do Mercado  */
+@media (max-width: 900px) {
+    .market-container {
+        padding: 1.5rem; 
+        margin: 1rem auto; 
+    }
+
+    .market-container h1 {
+        font-size: 1.8em; 
+    }
+
+    .crypto-table th, .crypto-table td {
+        padding: 0.8rem 1rem; 
+        font-size: 0.9rem; 
+    }
+
+    .crypto-icon {
+        width: 1.5rem; 
+        height: 1.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .crypto-symbol {
+        font-size: 0.75rem; 
+    }
+}
+
+@media (max-width: 600px) {
+    .market-container {
+        padding: 1rem;
+        margin: 0.5rem auto;
+    }
+
+    .market-container h1 {
+        font-size: 1.5em; 
+    }
+
+    .crypto-table th, .crypto-table td {
+        padding: 0.6rem 0.8rem; 
+        font-size: 0.8rem; 
+    }
+
+    .crypto-icon {
+        width: 1.2rem; 
+        height: 1.2rem;
+        margin-right: 0.4rem;
+    }
+
+    .crypto-symbol {
+        display: none;
+    }
+}
+
+/*Ocultar colunas menos importantes em telas muito pequenas */
+/*
+@media (max-width: 480px) {
+    .crypto-table th:nth-child(4), // Ex: Volume 24h
+    .crypto-table td:nth-child(4) {
+        display: none;
+    }
+}
+*/
