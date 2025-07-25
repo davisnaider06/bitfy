@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const Alert = require('../models/Alert'); 
+const Wallet = require('../models/Wallet');
+
 
 
 // Obter perfil do usuário autenticado
@@ -99,9 +101,8 @@ const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
 
-        
         if (req.user.id === id) {
-             return res.status(403).json({ message: 'Você não pode deletar sua própria conta através desta rota.' });
+            return res.status(403).json({ message: 'Você não pode deletar sua própria conta através desta rota.' });
         }
 
         const user = await User.findByPk(id);
@@ -109,14 +110,18 @@ const deleteUser = async (req, res) => {
             return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
 
+        // Corrigido: use o id corretamente
+        await Wallet.destroy({ where: { userId: id } });
+
         await user.destroy();
 
-        res.status(200).json({ message: 'Usuário deletado com sucesso.' });
+        res.status(200).json({ message: 'Usuário e carteira deletados com sucesso.' });
     } catch (error) {
         console.error('Erro ao deletar usuário:', error);
         res.status(500).json({ message: 'Erro no servidor ao deletar usuário.' });
     }
 };
+
 
 module.exports = {
     getAllUsers,
