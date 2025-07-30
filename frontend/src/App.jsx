@@ -15,7 +15,7 @@ import AlertManager from './pages/Alerts/AlertManager';
 import ProfileEdit from './pages/Profile/ProfileEdit';
 import Market from './pages/Market/Market';
 import Navbar from './components/Navbar/Navbar';
-import Trade from './pages/Trade/Trade'
+import TradePage from './pages/Trade/TradePage'
 import './App.css';
 
 function App() {
@@ -34,9 +34,9 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/alerts" element={<AlertManager />} />
+          <Route path="/trade" element={<TradePage />} />
           <Route path="/profile" element={<ProfileEdit />} />
           <Route path="/market" element={<Market />} />
-          <Route path="/trade" element={<Trade />} />
         </Route>
 
         {/* Redirecionamento padrão para login */}
