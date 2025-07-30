@@ -6,9 +6,10 @@ const { connectDB } = require('./config/database');
 const User = require('./models/User');
 const Alert = require('./models/Alert')
 const authRoutes = require('./routes/authRoutes');
-const userRoutes = require ('./routes/userRoutes')
-const alertRoutes = require('./routes/alertRoutes')
-const marketRoutes = require('./routes/marketRoutes')
+const userRoutes = require ('./routes/userRoutes');
+const alertRoutes = require('./routes/alertRoutes');
+const walletRoutes = require('./routes/walletRoutes');
+const marketRoutes = require('./routes/marketRoutes');
 const { startAlertMonitor } = require('./services/alertMonitor');
 const cryptoRoutes = require('./routes/cryptoRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes );
 app.use('/api/alerts', alertRoutes);
+app.use('/api/wallet', walletRoutes);
 app.use('/api/market', marketRoutes);
 app.use('/api/crypto', cryptoRoutes);
 app.use('/api/transactions', transactionRoutes);

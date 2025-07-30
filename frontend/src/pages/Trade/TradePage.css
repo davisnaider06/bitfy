@@ -1,0 +1,233 @@
+/* frontend/src/pages/TradePage/TradePage.css */
+
+.trade-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #1a1a2e; /* Fundo escuro */
+    color: #e0e0e0; /* Texto claro */
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    font-family: 'Inter', sans-serif;
+}
+
+.trade-container h1 {
+    color: #00bcd4; /* Azul ciano */
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.trade-subtitle {
+    text-align: center;
+    color: #a0a0a0;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.trade-section {
+    background-color: #2a2a4a; /* Cartões de seção mais claros */
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.trade-section h2 {
+    color: #00bcd4;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #00bcd4;
+    padding-bottom: 0.5rem;
+}
+
+.balance-display p {
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
+}
+
+.balance-display strong {
+    color: #00bcd4;
+}
+
+.asset-list {
+    list-style: none;
+    padding: 0;
+}
+
+.asset-list li {
+    background-color: #3a3a5a;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.asset-list li strong {
+    color: #76e2b3; /* Verde claro para símbolos */
+}
+
+.current-price-info {
+    font-size: 0.9rem;
+    color: #b0b0b0;
+}
+
+/* --- Operações Grid --- */
+.operations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.operation-card {
+    background-color: #3a3a5a;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.operation-card h3 {
+    color: #76e2b3;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.operation-card form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.operation-card input[type="number"],
+.operation-card input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 0.8rem 10px;
+    border: 1px solid #00bcd4;
+    border-radius: 8px;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.operation-card input[type="number"]:focus,
+.operation-card input[type="text"]:focus {
+    border-color: #76e2b3;
+    outline: none;
+}
+
+.operation-card button {
+    background-color: #00bcd4;
+    color: #1a1a2e;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.operation-card button:hover {
+    background-color: #76e2b3;
+    transform: translateY(-2px);
+}
+
+/* Estilos específicos para botões de compra/venda/deposito/saque */
+.operation-card.deposit button { background-color: #4CAF50; } /* Verde */
+.operation-card.deposit button:hover { background-color: #66BB6A; }
+
+.operation-card.withdraw button { background-color: #FFC107; color: #333; } /* Amarelo */
+.operation-card.withdraw button:hover { background-color: #FFD54F; }
+
+.operation-card.buy button { background-color: #2196F3; } /* Azul */
+.operation-card.buy button:hover { background-color: #64B5F6; }
+
+.operation-card.sell button { background-color: #F44336; } /* Vermelho */
+.operation-card.sell button:hover { background-color: #E57373; }
+
+
+/* --- Histórico de Transações --- */
+.transaction-list {
+    list-style: none;
+    padding: 0;
+}
+
+.transaction-item {
+    background-color: #3a3a5a;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-left: 5px solid; /* Borda colorida para tipo de transação */
+}
+
+.transaction-item.deposit { border-left-color: #4CAF50; }
+.transaction-item.withdraw { border-left-color: #FFC107; }
+.transaction-item.buy { border-left-color: #2196F3; }
+.transaction-item.sell { border-left-color: #F44336; }
+
+.transaction-item strong {
+    color: #00bcd4;
+}
+
+/* Mensagens de feedback */
+.success-message {
+    background-color: #4CAF50;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+.error-message {
+    background-color: #F44336;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+.back-to-dashboard-btn {
+    display: block;
+    width: fit-content;
+    margin: 2rem auto 0;
+    background-color: #555;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.back-to-dashboard-btn:hover {
+    background-color: #777;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .trade-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .operations-grid {
+        grid-template-columns: 1fr;
+    }
+}

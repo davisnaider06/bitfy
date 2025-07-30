@@ -5,7 +5,7 @@ import './AlertManager.css';
 function AlertManager() {
   const [alerts, setAlerts] = useState([]);
   const [assetSymbol, setAssetSymbol] = useState('');
-  const [alertType, setAlertType] = useState('ABOVE'); 
+  const [alertType, setAlertType] = useState('ABOVE');
   const [triggerPrice, setTriggerPrice] = useState('');
   const [whatsappNumber, setWhatsappNumber] = useState('');
   const [reportFrequency, setReportFrequency] = useState('daily');
@@ -25,7 +25,8 @@ function AlertManager() {
       return;
     }
     try {
-      const response = await fetch('/api/alerts', {
+      // CORREÇÃO: Usar URL absoluta para o backend
+      const response = await fetch('http://localhost:3001/api/alerts', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -41,7 +42,7 @@ function AlertManager() {
     } catch (err) {
       console.error('Erro ao buscar alertas:', err);
       setError(err.message || 'Falha ao carregar alertas.');
-      if (err.message.includes('autenticado')) {// Redireciona se token invalido
+      if (err.message.includes('autenticado')) { // Redireciona se token invalido
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/login');
@@ -54,24 +55,24 @@ function AlertManager() {
     setMessage('');
     setError('');
 
-    //Validações básicas
+    // Validações básicas
     if (!assetSymbol) {
-        setError('Símbolo do ativo é obrigatório.');
-        return;
+      setError('Símbolo do ativo é obrigatório.');
+      return;
     }
-    
+
     if (alertType !== 'DAILY_REPORT' && !triggerPrice) {
-        setError('Preço de disparo é obrigatório para alertas de preço (Acima/Abaixo).');
-        return;
+      setError('Preço de disparo é obrigatório para alertas de preço (Acima/Abaixo).');
+      return;
     }
     if (!whatsappNumber) {
-        setError('Número de WhatsApp é obrigatório.');
-        return;
+      setError('Número de WhatsApp é obrigatório.');
+      return;
     }
 
     const token = localStorage.getItem('token');
     const method = editingAlertId ? 'PUT' : 'POST';
-    const url = editingAlertId ? `/api/alerts/${editingAlertId}` : '/api/alerts';
+    const url = editingAlertId ? `http://localhost:3001/api/alerts/${editingAlertId}` : 'http://localhost:3001/api/alerts'; // CORREÇÃO: URL absoluta
 
     const payload = {
       assetSymbol: assetSymbol.toUpperCase(),
@@ -79,6 +80,8 @@ function AlertManager() {
       whatsappNumber,
       triggerPrice: alertType !== 'DAILY_REPORT' ? parseFloat(triggerPrice) : null,
       reportFrequency: alertType === 'DAILY_REPORT' ? reportFrequency : null,
+      // Não inclua 'status' aqui, pois ele é definido no backend como 'ACTIVE' na criação
+      // ou atualizado para 'ACTIVE'/'INACTIVE' na função handleToggleActive
     };
 
     try {
@@ -100,9 +103,9 @@ function AlertManager() {
         setAlertType('ABOVE');
         setTriggerPrice('');
         setWhatsappNumber('');
-        setReportFrequency('daily'); //Resetar para o padrão
+        setReportFrequency('daily'); // Resetar para o padrão
         setEditingAlertId(null);
-        fetchAlerts(); //Atualiza a lista
+        fetchAlerts(); // Atualiza a lista
       } else {
         throw new Error(data.message || 'Erro ao salvar alerta.');
       }
@@ -116,17 +119,18 @@ function AlertManager() {
     setEditingAlertId(alert.id);
     setAssetSymbol(alert.assetSymbol);
     setAlertType(alert.alertType);
-    setTriggerPrice(alert.triggerPrice || ''); 
+    setTriggerPrice(alert.triggerPrice || '');
     setWhatsappNumber(alert.whatsappNumber);
-    setReportFrequency(alert.reportFrequency || 'daily'); 
+    setReportFrequency(alert.reportFrequency || 'daily');
   };
 
   const handleDelete = async (id) => {
+    // Melhoria: Considerar um modal de confirmação personalizado em vez de window.confirm
     if (!window.confirm('Tem certeza que deseja excluir este alerta?')) return;
 
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`/api/alerts/${id}`, {
+      const response = await fetch(`http://localhost:3001/api/alerts/${id}`, { // CORREÇÃO: URL absoluta
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -148,18 +152,20 @@ function AlertManager() {
 
   const handleToggleActive = async (alert) => {
     const token = localStorage.getItem('token');
+    // CORREÇÃO: Mudar 'isActive' para 'status' e alternar entre 'ACTIVE' e 'INACTIVE'
+    const newStatus = alert.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     try {
-      const response = await fetch(`/api/alerts/${alert.id}`, {
+      const response = await fetch(`http://localhost:3001/api/alerts/${alert.id}`, { // CORREÇÃO: URL absoluta
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ isActive: !alert.isActive, messageSent: false }), 
+        body: JSON.stringify({ status: newStatus, messageSent: false }), // CORREÇÃO: Enviar 'status'
       });
       const data = await response.json();
       if (response.ok) {
-        setMessage(`Alerta ${alert.isActive ? 'desativado' : 'ativado'} com sucesso!`);
+        setMessage(`Alerta ${newStatus === 'INACTIVE' ? 'desativado' : 'ativado'} com sucesso!`); // CORREÇÃO: Mensagem baseada no novo status
         fetchAlerts();
       } else {
         throw new Error(data.message || 'Erro ao alterar status do alerta.');
@@ -183,7 +189,7 @@ function AlertManager() {
             type="text"
             id="assetSymbol"
             value={assetSymbol}
-            onChange={(e) => setAssetSymbol(e.target.value.toUpperCase())} //Salva em maiúsculas
+            onChange={(e) => setAssetSymbol(e.target.value.toUpperCase())} // Salva em maiúsculas
             required
             placeholder="Ex: BTCUSDT"
           />
@@ -198,11 +204,11 @@ function AlertManager() {
           >
             <option value="ABOVE">Preço Acima de</option>
             <option value="BELOW">Preço Abaixo de</option>
-            <option value="DAILY_REPORT">Relatório Diário</option> 
+            <option value="DAILY_REPORT">Relatório Diário</option>
           </select>
         </div>
 
-        {alertType !== 'DAILY_REPORT' && (//Mostra triggerPrice apenas para ABOVE/BELOW
+        {alertType !== 'DAILY_REPORT' && ( // Mostra triggerPrice apenas para ABOVE/BELOW
           <div className="form-group">
             <label htmlFor="triggerPrice">Preço de Disparo:</label>
             <input
@@ -217,7 +223,7 @@ function AlertManager() {
           </div>
         )}
 
-        {alertType === 'DAILY_REPORT' && (//Mostra reportFrequency apenas pro DAILY_REPORT
+        {alertType === 'DAILY_REPORT' && ( // Mostra reportFrequency apenas pro DAILY_REPORT
           <div className="form-group">
             <label htmlFor="reportFrequency">Frequência do Relatório:</label>
             <select
@@ -227,7 +233,6 @@ function AlertManager() {
             >
               <option value="daily">Diário</option>
               <option value="weekly">Semanal</option>
-              
             </select>
           </div>
         )}
@@ -253,7 +258,7 @@ function AlertManager() {
       ) : (
         <ul className="alert-list">
           {alerts.map((alert) => (
-            <li key={alert.id} className="alert-item">
+            <li key={alert.id} className="alert-item"> {/* alert.id é o correto */}
               <div className="alert-details">
                 <strong>Símbolo:</strong> {alert.assetSymbol} <br />
                 <strong>Tipo:</strong> {alert.alertType}
@@ -265,12 +270,13 @@ function AlertManager() {
                 )}
                 <br />
                 <strong>WhatsApp:</strong> {alert.whatsappNumber} <br />
-                <strong>Status:</strong> {alert.isActive ? 'Ativo' : 'Inativo'} {' '}
-                {alert.alertType !== 'DAILY_REPORT' && alert.messageSent && alert.isActive && ( //Mostrar "disparado" apenas para ABOVE/BELOW ativos e disparados
-                    <span style={{ color: 'orange', fontWeight: 'bold' }}>(Disparado)</span>
+                {/* CORREÇÃO: Usar alert.status para exibir e verificar */}
+                <strong>Status:</strong> {alert.status === 'ACTIVE' ? 'Ativo' : 'Inativo'} {' '}
+                {alert.alertType !== 'DAILY_REPORT' && alert.messageSent && alert.status === 'ACTIVE' && ( // Mostrar "disparado" apenas para ABOVE/BELOW ativos e disparados
+                  <span style={{ color: 'orange', fontWeight: 'bold' }}>(Disparado)</span>
                 )}
-                 {alert.alertType !== 'DAILY_REPORT' && !alert.isActive && alert.messageSent && (
-                    <span style={{ color: 'gray' }}>(Disparado antes de desativar)</span>
+                {alert.alertType !== 'DAILY_REPORT' && alert.status === 'INACTIVE' && alert.messageSent && ( // Mostrar "disparado antes de desativar"
+                  <span style={{ color: 'gray' }}>(Disparado antes de desativar)</span>
                 )}
                 {alert.lastReportSentAt && alert.alertType === 'DAILY_REPORT' && (
                   <> <br /> <strong>Último Relatório:</strong> {new Date(alert.lastReportSentAt).toLocaleString('pt-BR')}</>
@@ -280,9 +286,9 @@ function AlertManager() {
                 <button onClick={() => handleEdit(alert)} className="edit-btn">Editar</button>
                 <button
                   onClick={() => handleToggleActive(alert)}
-                  className={alert.isActive ? 'deactivate-btn' : 'activate-btn'}
+                  className={alert.status === 'ACTIVE' ? 'deactivate-btn' : 'activate-btn'} // CORREÇÃO: Classe baseada no status
                 >
-                  {alert.isActive ? 'Desativar' : 'Ativar'}
+                  {alert.status === 'ACTIVE' ? 'Desativar' : 'Ativar'} {/* CORREÇÃO: Texto baseado no status */}
                 </button>
                 <button onClick={() => handleDelete(alert.id)} className="delete-btn">Excluir</button>
               </div>

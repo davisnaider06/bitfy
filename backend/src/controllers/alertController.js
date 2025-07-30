@@ -59,6 +59,22 @@ const getMyAlerts = async (req, res) => {
 };
 
 
+const getActiveAlertByUser = async (req, res) => {
+  const userId = req.user.id; // Deve vir do req.user.id
+  try {
+    const alerts = await Alert.findAll({ // Alterei para findAll, pois pode haver vários alertas
+      where: {
+        userId,
+        status: 'ACTIVE' // Use 'status' em vez de 'isActive'
+      }
+    });
+    res.json(alerts); // Retorne o array de alertas
+  } catch (error) {
+    console.error('Erro ao buscar alertas ativos:', error);
+    res.status(500).json({ error: 'Erro ao buscar alertas ativos' });
+  }
+};
+
 // Pega um alerta específico
 const getAlertById = async (req, res) => {
     const { id } = req.params;
@@ -142,6 +158,7 @@ const deleteAlert = async (req, res) => {
 module.exports = {
   createAlert,
   getMyAlerts,
+  getActiveAlertByUser,
   getAlertById,
   updateAlert,
   deleteAlert,

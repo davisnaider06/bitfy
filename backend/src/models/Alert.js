@@ -1,6 +1,7 @@
+// backend/src/models/Alert.js
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const User = require('./User'); 
+const User = require('./User'); // Importe o modelo User se ele for usado diretamente aqui para referências
 
 const Alert = sequelize.define('Alert', {
     id: {
@@ -8,11 +9,11 @@ const Alert = sequelize.define('Alert', {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    userId: { //Chave estrangeira para o usuário que criou o alerta
+    userId: { // Chave estrangeira para o usuário que criou o alerta
         type: DataTypes.UUID,
         allowNull: false,
-        references: { 
-            model: User, 
+        references: {
+            model: User, // Referencia o modelo User (certifique-se de que User.js exporta o modelo User)
             key: 'id',
         },
     },
@@ -20,13 +21,13 @@ const Alert = sequelize.define('Alert', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    alertType: { // Ex 'ABOVE', 'BELOW', 'DAILY_REPORT'
+    alertType: { // Ex: 'ABOVE', 'BELOW', 'DAILY_REPORT'
         type: DataTypes.STRING,
         allowNull: false,
     },
     triggerPrice: {
         type: DataTypes.FLOAT,
-        allowNull: true, 
+        allowNull: true,
     },
     whatsappNumber: {
         type: DataTypes.STRING,
@@ -36,13 +37,19 @@ const Alert = sequelize.define('Alert', {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
     },
-    isActive: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
+    // Remova a coluna 'isActive' - ELA NÃO DEVE ESTAR AQUI!
+    // isActive: {
+    //     type: DataTypes.BOOLEAN,
+    //     defaultValue: true,
+    // },
+    // ADICIONE A COLUNA 'status' - ELA DEVE ESTAR AQUI!
+    status: { // Ex: 'ACTIVE', 'TRIGGERED', 'COMPLETED', 'CANCELED'
+        type: DataTypes.STRING, // Use STRING para estados como 'ACTIVE'
+        defaultValue: 'ACTIVE', // Valor padrão para novos alertas
+        allowNull: false,
     },
-
-    reportFrequency: { // Ex 'daily', 'weekly'
-        type: DataTypes.STRING, // Consider using DataTypes.ENUM('daily', 'weekly') for strictness
+    reportFrequency: { // Ex: 'daily', 'weekly'
+        type: DataTypes.STRING, // Considerar DataTypes.ENUM('daily', 'weekly') para maior controle
         allowNull: true, // Nulo para alertas de preço
     },
     lastReportSentAt: { // Armazena a última vez que um relatório foi enviado
@@ -51,12 +58,13 @@ const Alert = sequelize.define('Alert', {
     },
 }, {
     timestamps: true, // createdAt, updatedAt
-    tableName: 'alerts', 
+    tableName: 'Alerts', // Boa prática especificar o nome da tabela
 });
 
-
-// Define a associação entre User e Alert
-User.hasMany(Alert, { foreignKey: 'userId'});
-Alert.belongsTo(User, { foreignKey: 'userId', onDelet: 'CASCADE' });
+// As associações devem ser definidas no arquivo 'associations.js'
+// para garantir que todos os modelos estejam carregados antes de associá-los.
+// REMOVA QUALQUER ASSOCIAÇÃO DAQUI SE VOCÊ TEM UM 'associations.js' SEPARADO.
+// User.hasMany(Alert, { foreignKey: 'userId'});
+// Alert.belongsTo(User, { foreignKey: 'userId', onDelet: 'CASCADE' });
 
 module.exports = Alert;

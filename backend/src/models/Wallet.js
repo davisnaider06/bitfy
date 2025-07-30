@@ -1,7 +1,7 @@
-// backend/models/Wallet.js - Versão para Sequelize e PostgreSQL
+// backend/src/models/Wallet.js
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const User = require('./User'); // Importa o modelo User para a associação
+const User = require('./User');
 
 const Wallet = sequelize.define('Wallet', {
     id: {
@@ -9,63 +9,68 @@ const Wallet = sequelize.define('Wallet', {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    userId: { // Chave estrangeira para o User
+    userId: {
         type: DataTypes.UUID,
-        references: {
-            model: User,
-            key: 'id'
-        },
         allowNull: false,
-        unique: true // Cada usuário tem apenas uma entrada de carteira
+        references: {
+            model: 'Users',
+            key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+    },
+    type: {
+        type: DataTypes.ENUM('real', 'demo'),
+        allowNull: false,
+        defaultValue: 'real',
     },
     BRL: {
-        type: DataTypes.DECIMAL(20, 2), // 2 casas decimais para BRL
-        defaultValue: 0.00,
-        allowNull: false,
-        validate: {
-            min: {
-                args: [0],
-                msg: 'Saldo BRL não pode ser negativo'
+            type: DataTypes.DECIMAL(20, 8),
+            allowNull: false,
+            defaultValue: '10000.00', 
+            get() {
+                const rawValue = this.getDataValue('BRL');
+                return rawValue ? parseFloat(rawValue) : 0;
+            },
+            set(value) {
+                this.setDataValue('BRL', value !== null ? parseFloat(value).toFixed(8) : '0.00000000');
             }
-        }
-    },
-    // Usaremos um tipo JSONB para armazenar os ativos como um objeto
-    // Ex: { "BTC": "0.05", "ETH": "1.2" }
-    // Os valores serão strings para manter a precisão com DECIMAL
+        },
     assets: {
         type: DataTypes.JSONB,
-        defaultValue: {},
         allowNull: false,
+        defaultValue: {},
         get() {
-            // Ao obter, convertemos os valores para números (se possível e necessário)
             const rawValue = this.getDataValue('assets');
             if (rawValue && typeof rawValue === 'object') {
                 const parsedAssets = {};
                 for (const key in rawValue) {
-                    parsedAssets[key] = parseFloat(rawValue[key]); // Converte para float ao ler
+                    parsedAssets[key] = parseFloat(rawValue[key] || 0);
                 }
                 return parsedAssets;
             }
             return {};
         },
         set(value) {
-            // Ao definir, garantimos que os valores são strings para DECIMAL ou mantemos como estão
-            const stringifiedAssets = {};
+            const serializedAssets = {};
             if (value && typeof value === 'object') {
                 for (const key in value) {
-                    stringifiedAssets[key] = String(value[key]); // Converte para string ao escrever
+                    serializedAssets[key] = parseFloat(value[key] || 0).toFixed(8);
                 }
             }
-            this.setDataValue('assets', stringifiedAssets);
+            this.setDataValue('assets', serializedAssets);
         }
     }
 }, {
-    timestamps: true, // Adiciona createdAt e updatedAt
-    updatedAt: 'updatedAt' // Nome da coluna para updatedAt
+    tableName: 'Wallets',
+    timestamps: true,
+    indexes: [
+        {
+            unique: true,
+            fields: ['userId', 'type'],
+            name: 'unique_user_wallet_type'
+        }
+    ]
 });
-
-// Define a associação: Uma Carteira pertence a um Usuário
-Wallet.belongsTo(User, { foreignKey: 'userId', as: 'user', onDelete: 'CASCADE' });
-User.hasOne(Wallet, { foreignKey: 'userId', as: 'wallet' });
 
 module.exports = Wallet;
