@@ -1,7 +1,8 @@
 // backend/src/services/alertMonitor.js
 const axios = require('axios');
-const cron = require('node-cron'); // Usando cron para agendamento
-const Alert = require('../models/Alert');
+const cron = require('node-cron');
+const Alert = require('../models/Alert'); // Certifique-se de que o modelo Alert está correto
+// const User = require('../models/User'); // Importe User se precisar de user.whatsappNumber aqui
 const twilio = require('twilio');
 
 // Inicia o Twilio
@@ -11,11 +12,11 @@ const TWILIO_WHATSAPP_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER;
 // Busca o preço atual de um ativo na Binance
 const getAssetPrice = async (symbol) => {
     try {
-        const response = await axios.get(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol.toUpperCase()}`); // Garante uppercase
+        const response = await axios.get(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol.toUpperCase()}`);
         return parseFloat(response.data.price);
     } catch (error) {
         console.error(`Erro ao buscar preço para ${symbol}:`, error.message);
-        return null; // Retorna null em caso de erro
+        return null;
     }
 };
 
@@ -45,24 +46,38 @@ const monitorAlerts = async () => {
     console.log('Iniciando monitoramento de alertas...');
     try {
         // Busca todos os alertas ATIVOS
-        // Aqui usamos 'isActive' conforme o modelo revisado, e não 'status: ACTIVE'
-        const activeAlerts = await Alert.findAll({ where: { isActive: true } });
+        // CORREÇÃO AQUI: Usar 'status' em vez de 'isActive'
+        const alertsToMonitor = await Alert.findAll({
+            where: {
+                status: 'ACTIVE' // <--- ESTA É A LINHA CRÍTICA QUE PRECISA ESTAR ASSIM
+            },
+            // Se precisar incluir informações do usuário (ex: para whatsappNumber), adicione:
+            // include: [{ model: User, attributes: ['whatsappNumber'] }]
+        });
 
-        for (const alert of activeAlerts) {
+        if (alertsToMonitor.length === 0) {
+            console.log('Nenhum alerta ativo para monitorar.');
+            return;
+        }
+
+        console.log(`Monitorando ${alertsToMonitor.length} alertas.`);
+
+        for (const alert of alertsToMonitor) {
             // Lógica para DAILY_REPORT
             if (alert.alertType === 'DAILY_REPORT') {
                 const now = new Date();
                 let shouldSendReport = false;
 
                 if (!alert.lastReportSentAt) {
-                    shouldSendReport = true; // Envia se nunca foi enviado
+                    shouldSendReport = true;
                 } else {
                     const lastSent = new Date(alert.lastReportSentAt);
                     const hoursSinceLastReport = (now - lastSent) / (1000 * 60 * 60);
 
+                    // Corrigido o typo 'hoursSinceSinceLastReport' para 'hoursSinceLastReport'
                     if (alert.reportFrequency === 'daily' && hoursSinceLastReport >= 24) {
                         shouldSendReport = true;
-                    } else if (alert.reportFrequency === 'weekly' && hoursSinceSinceLastReport >= (7 * 24)) {
+                    } else if (alert.reportFrequency === 'weekly' && hoursSinceLastReport >= (7 * 24)) {
                         shouldSendReport = true;
                     }
                 }
@@ -71,24 +86,22 @@ const monitorAlerts = async () => {
                     const currentPrice = await getAssetPrice(alert.assetSymbol);
                     if (currentPrice === null) {
                         console.log(`Não foi possível obter o preço para ${alert.assetSymbol}. Pulando relatório.`);
-                        continue; // Pula para o próximo alerta se não conseguir o preço
+                        continue;
                     }
 
                     const reportMessage = `📈 Bitfy Relatório Diário para ${alert.assetSymbol.toUpperCase()}: Preço atual R$ ${currentPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 8 })}.`;
 
                     try {
                         await sendWhatsAppMessage(alert.whatsappNumber, reportMessage);
-                        alert.lastReportSentAt = now; // Atualiza a hora do último envio
+                        alert.lastReportSentAt = now;
                         await alert.save();
                         console.log(`Relatório diário enviado para ${alert.whatsappNumber} para ${alert.assetSymbol}.`);
                     } catch (msgError) {
                         console.error(`Erro ao enviar relatório para ${alert.whatsappNumber}:`, msgError.message);
-                        // Não atualiza lastReportSentAt se o envio da mensagem falhar
                     }
                 }
             } else {
                 // Lógica para alertas ABOVE/BELOW
-                // Se o alerta já foi disparado (messageSent=true) e não é relatório, pule.
                 if (alert.messageSent) {
                     console.log(`Alerta de preço para ${alert.assetSymbol} já foi disparado e precisa ser reativado.`);
                     continue;
@@ -114,9 +127,7 @@ const monitorAlerts = async () => {
                 if (shouldTrigger) {
                     try {
                         await sendWhatsAppMessage(alert.whatsappNumber, message);
-                        alert.messageSent = true; // Marca como enviado
-                        // Se você quiser manter 'lastTriggeredAt' no modelo, pode definir aqui
-                        // alert.lastTriggeredAt = new Date();
+                        alert.messageSent = true;
                         await alert.save();
                         console.log(`Alerta de preço para ${alert.assetSymbol} disparado e marcado como enviado.`);
                     } catch (msgError) {
@@ -127,8 +138,9 @@ const monitorAlerts = async () => {
         }
     } catch (error) {
         console.error('Erro geral no monitoramento de alertas:', error);
+    } finally {
+        console.log('Monitoramento de alertas concluído.');
     }
-    console.log('Monitoramento de alertas concluído.');
 };
 
 // Função para iniciar o agendador de tarefas

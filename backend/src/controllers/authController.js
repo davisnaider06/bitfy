@@ -97,7 +97,7 @@ console.log('Tentativa de login para:', { email, password });
       message: 'Login bem-sucedido!',
       user: {
         id: user.id,
-        name: user.username,
+        name: user.name,
         email: user.email,
         whatsappNumber: user.whatsappNumber,
       },

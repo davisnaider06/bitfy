@@ -4,6 +4,7 @@ const { protect } = require('../middleware/authMiddleware');
 const {
   createAlert,
   getMyAlerts,
+  getActiveAlertByUser,
   getAlertById,
   updateAlert,
   deleteAlert,
@@ -17,6 +18,8 @@ router.use(protect); //middleware de proteção a todas as rotas abaixo
 router.route('/')
   .post(createAlert)   //POST /api/alerts
   .get(getMyAlerts);  //GET /api/alerts
+
+  router.get('/active', protect, getActiveAlertByUser);
 
 router.route('/:id')
   .get(getAlertById)   //GET /api/alerts/:id

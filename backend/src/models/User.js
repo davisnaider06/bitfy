@@ -45,11 +45,17 @@ const User = sequelize.define('User', {
     resetPasswordExpires: {
         type: DataTypes.DATE,
         allowNull: true, 
-    }
+    },
+
+    balance: {
+        type: DataTypes.FLOAT,
+        defaultValue: 10000.00,
+        allowNull: false,
+    },
     
 }, {
     timestamps: true, //createdAt updatedAt
-    tableName: 'users', 
+    tableName: 'Users', 
 });
 
 

@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 const User = require('./User'); 
+const Wallet = require('./Wallet'); 
 
 const Transaction = sequelize.define('Transaction', {
     id: {
@@ -8,51 +9,55 @@ const Transaction = sequelize.define('Transaction', {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    userId: {
+    userId: { // ID do usuário que realizou a transação
         type: DataTypes.UUID,
+        allowNull: false,
         references: {
             model: User,
-            key: 'id'
+            key: 'id',
         },
-        allowNull: false
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
     },
-    type: { // 'buy', 'sell', 'deposit', 'withdraw'
-        type: DataTypes.ENUM('buy', 'sell', 'deposit', 'withdraw'),
-        allowNull: false
-    },
-    assetSymbol: { // Ex: BTCUSDT. Null para deposit/withdraw de BRL
-        type: DataTypes.STRING,
-        allowNull: true // Pode ser nulo para depósito/saque de BRL
-    },
-    amount: { // Quantidade da cripto (para buy/sell) ou BRL (para deposit/withdraw)
-        type: DataTypes.DECIMAL(20, 8), // Para precisão
+    walletId: { // ID da carteira envolvida na transação
+        type: DataTypes.UUID,
         allowNull: false,
-        validate: {
-            min: {
-                args: [0],
-                msg: 'Quantidade não pode ser negativa'
-            }
-        }
+        references: {
+            model: Wallet,
+            key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
     },
-    priceAtExecution: {
-        type: DataTypes.DECIMAL(20, 8),
-        allowNull: true
+    type: { // Tipo da transação: 'DEPOSIT', 'WITHDRAW', 'BUY', 'SELL'
+        type: DataTypes.ENUM('DEPOSIT', 'WITHDRAW', 'BUY', 'SELL'),
+        allowNull: false,
     },
-    fiatAmount: { 
-        type: DataTypes.DECIMAL(20, 2), 
-        allowNull: true
+    assetSymbol: { // Símbolo do ativo (ex: 'BTC', 'ETH', 'BRL' para depósitos/saques)
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-    status: { // 'completed', 'pending', 'failed'
-        type: DataTypes.ENUM('completed', 'pending', 'failed'),
-        defaultValue: 'completed',
-        allowNull: false
-    }
+    amount: { // Quantidade do ativo transacionado (ex: 0.001 BTC, 500 BRL)
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    price: { // Preço do ativo no momento da transação (para BUY/SELL)
+        type: DataTypes.FLOAT,
+        allowNull: true, // Pode ser nulo para DEPOSIT/WITHDRAW
+    },
+    BRLAmount: { // Valor total em BRL da transação (ex: 50000.00 BRL para 0.001 BTC)
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    status: { // Status da transação: 'COMPLETED', 'PENDING', 'FAILED'
+        type: DataTypes.ENUM('COMPLETED', 'PENDING', 'FAILED'),
+        defaultValue: 'COMPLETED',
+        allowNull: false,
+    },
+    // Você pode adicionar mais campos como 'transactionHash' para blockchain, 'fee', etc.
 }, {
-    timestamps: true 
+    timestamps: true, // createdAt, updatedAt
+    tableName: 'Transactions',
 });
-
-
-Transaction.belongsTo(User, { foreignKey: 'userId', as: 'user', onDelete: 'CASCADE' }); // <--- ADICIONE onDelete: 'CASCADE' AQUI!
-User.hasMany(Transaction, { foreignKey: 'userId', as: 'transactions' });
 
 module.exports = Transaction;
